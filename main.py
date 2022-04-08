@@ -148,12 +148,12 @@ class TurtleWorld:
         self.blue_flag = turtle.Turtle()
         self.blue_flag.shape("arrow")
         self.blue_flag.color(BLUE)
-        self.blue_flag.penup()
+        self.blue_flag.pensize(5)
 
         self.red_flag = turtle.Turtle()
         self.red_flag.shape("arrow")
         self.red_flag.color(RED)
-        self.red_flag.penup()
+        self.red_flag.pensize(5)
 
         self.reset_flag(BLUE)
         self.reset_flag(RED)
@@ -209,9 +209,11 @@ class TurtleWorld:
             x = random.randint(0, BOARD_WIDTH-1)
             y = random.randint(math.floor(3 * BOARD_HEIGHT / 4 ), BOARD_HEIGHT-1)
             self.blue_flag_pos = (x,y)
-            x = x * WIDTH/BOARD_WIDTH - WIDTH / 2 + WIDTH/80
-            y = y *  HEIGHT/BOARD_HEIGHT - HEIGHT/ 2 + HEIGHT/40
+            x = x * WIDTH/BOARD_WIDTH - WIDTH / 2 + WIDTH/40
+            y = y *  HEIGHT/BOARD_HEIGHT - HEIGHT/ 2 + 5
             self.blue_flag.goto(x,y)
+            self.blue_flag.clear()
+            self.blue_flag.goto(x,y+20)
 
         if color == RED:
             # Red Flag reset
@@ -219,9 +221,11 @@ class TurtleWorld:
             x = random.randint(0, BOARD_WIDTH-1)
             y = random.randint(0, math.floor(BOARD_HEIGHT / 4 ))
             self.red_flag_pos = (x,y)
-            x = x * WIDTH/BOARD_WIDTH - WIDTH / 2 + WIDTH/80
-            y = y *  HEIGHT/BOARD_HEIGHT - HEIGHT/ 2 + HEIGHT/40
+            x = x * WIDTH/BOARD_WIDTH - WIDTH / 2 + WIDTH/40
+            y = y *  HEIGHT/BOARD_HEIGHT - HEIGHT/ 2  + 5
             self.red_flag.goto(x,y)
+            self.red_flag.clear()
+            self.red_flag.goto(x,y+20)
 
     def get_flag_pos(self, colour):
         if colour == BLUE:
