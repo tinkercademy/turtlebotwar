@@ -10,21 +10,6 @@ ws = turtle.Screen()
 
 ws.screensize(WIDTH, HEIGHT)
 
-##### RED-BLUE AREA ########
-
-#############################
-# RED AREA            (19,19)
-#
-#
-#
-# (0, 10)
-#############################
-# BLUE AREA
-#
-#
-#
-# (0,0)
-#############################
 
 NO_BOTS = 2
 blue_bots = []

@@ -4,11 +4,11 @@ from constants import *
 ##### RED-BLUE AREA ########
 
 #############################
-# RED AREA            (19,19)
+# RED AREA            (9,9)
 #
 #
 #
-# (0, 10)
+# (0, 5)
 #############################
 # BLUE AREA
 #
@@ -19,7 +19,6 @@ from constants import *
 
 # API
 #
-# World Coordinates
 # world.flag_dist(turtle, colour, axis)
 # e.g. world.flag_dist(turtle, "blue", X)
 # returns distance to flag in that axis
@@ -27,6 +26,11 @@ from constants import *
 # world.turtle_dist(turtle, colour, index, axis)
 # e.g. world.turtle_dist(turtle, "red", 0, Y)
 # returns distance to turtle in that axis
+#
+# turtle.register_move(direction)
+# e.g. turt.register_move(EAST)
+#
+
 
 def move(turt, world):
     if turt.index == 0:
