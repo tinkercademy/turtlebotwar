@@ -20,16 +20,18 @@ from constants import *
 # API
 #
 # world.flag_dist(turtle, colour, axis)
-# e.g. world.flag_dist(turtle, "blue", X)
+# e.g. world.flag_dist(turtle, BLUE, X)
 # returns distance to flag in that axis
 #
 # world.turtle_dist(turtle, colour, index, axis)
-# e.g. world.turtle_dist(turtle, "red", 0, Y)
+# e.g. world.turtle_dist(turtle, RED, 0, Y)
 # returns distance to turtle in that axis
 #
 # turtle.register_move(direction)
 # e.g. turt.register_move(EAST)
 #
+# turtle.capture_flag()
+# if you're the flag, you can capture the flag
 
 
 def move(turt, world):

@@ -6,10 +6,8 @@ import time
 import blue
 import red
 
-ws = turtle.Screen()
-
-ws.screensize(WIDTH, HEIGHT)
-
+#ws = turtle.Screen()
+#ws.screensize(WIDTH, HEIGHT)
 
 NO_BOTS = 2
 blue_bots = []
@@ -36,12 +34,14 @@ class TurtleBot:
         if self.color == RED:
             while True:
                 self.pos = { 'x': random.randint(0, BOARD_WIDTH-1) , 'y': random.randint(BOARD_HEIGHT/2, BOARD_HEIGHT-1) }
+                # We can't teleport onto the opponent flag
                 if not (world.blue_flag_pos[0] == self.pos['x'] and world.blue_flag_pos[1] == self.pos['y']):
                     break
 
         elif self.color == BLUE:
             while True:
                 self.pos = { 'x': random.randint(0, BOARD_WIDTH-1) , 'y': random.randint(0, BOARD_HEIGHT/2 - 1) }
+                # We can't teleport onto the opponent flag
                 if not (world.red_flag_pos[0] == self.pos['x'] and world.red_flag_pos[1] == self.pos['y']):
                     break
 
@@ -70,6 +70,7 @@ class TurtleBot:
             fx, fy = self.world.blue_flag_pos
         elif self.color == BLUE:
             fx, fy = self.world.red_flag_pos
+        # If we are touching our opponent's flag, the move is disallowed
         flag_touch = fx == local_x and fy == local_y
 
         return in_bounds and not flag_touch
@@ -191,8 +192,16 @@ class TurtleWorld:
         if color == BLUE:
             # Blue Flag reset
             # generated in red territory
-            x = random.randint(0, BOARD_WIDTH-1)
-            y = random.randint(math.floor(3 * BOARD_HEIGHT / 4 ), BOARD_HEIGHT-1)
+            while True:
+                x = random.randint(0, BOARD_WIDTH-1)
+                y = random.randint(math.floor(3 * BOARD_HEIGHT / 4 ), BOARD_HEIGHT-1)
+                # We can't teleport onto a red turtle
+                conflict = False 
+                for bot in red_bots:
+                    if bot.pos['x'] == x and bot.pos['y'] == y:
+                        conflict = True
+                if not conflict:
+                    break
             self.blue_flag_pos = (x,y)
             x = x * WIDTH/BOARD_WIDTH - WIDTH / 2 + WIDTH/40
             y = y *  HEIGHT/BOARD_HEIGHT - HEIGHT/ 2 + 5
@@ -203,8 +212,17 @@ class TurtleWorld:
         if color == RED:
             # Red Flag reset
             # generated in blueterritory
-            x = random.randint(0, BOARD_WIDTH-1)
-            y = random.randint(0, math.floor(BOARD_HEIGHT / 4 ))
+
+            while True:
+                x = random.randint(0, BOARD_WIDTH-1)
+                y = random.randint(0, math.floor(BOARD_HEIGHT / 4 ))
+                # We can't teleport onto a blue turtle
+                conflict = False 
+                for bot in blue_bots:
+                    if bot.pos['x'] == x and bot.pos['y'] == y:
+                        conflict = True
+                if not conflict:
+                    break
             self.red_flag_pos = (x,y)
             x = x * WIDTH/BOARD_WIDTH - WIDTH / 2 + WIDTH/40
             y = y *  HEIGHT/BOARD_HEIGHT - HEIGHT/ 2  + 5
@@ -277,17 +295,9 @@ def resolve_move_conflicts():
             if bot != other_bot: # there is no move conflict for the bot with itself
                 distance = calc_distance(bot, other_bot)
                 if distance == 0:
-                    # todo - we transport the losing bot back home
-                    if bot.color == other_bot.color:
-                        # transport both bots home
-                        bot.teleport_random()
-                        other_bot.teleport_random()
-                    else:
-                        # check which bots win this move conflict
-                        if bot.in_home_territory():
-                            other_bot.teleport_random()
-                        else:
-                            bot.teleport_random()
+                    # transport both bots home
+                    bot.teleport_random()
+                    other_bot.teleport_random()
 
                 elif distance == 1:
                     # todo - we check if they crossed each other
@@ -299,11 +309,8 @@ def resolve_move_conflicts():
                          and bot.registered_move == NORTH and other_bot.registered_move == SOUTH) or \
                         (bot.pos['y'] < other_bot.pos['y'] \
                          and bot.registered_move == SOUTH and other_bot.registered_move == NORTH)):
-                        # check which bots win this move conflict
-                        if bot.in_home_territory():
-                            other_bot.teleport_random()
-                        else:
-                            bot.teleport_random()
+                        other_bot.teleport_random()
+                        bot.teleport_random()
 
 def run_step():
     for bot in blue_bots:
@@ -333,4 +340,4 @@ while True:
     if turn < 0:
         break
 
-ws.exitonclick()
+#ws.exitonclick()
