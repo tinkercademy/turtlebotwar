@@ -12,6 +12,8 @@ import red
 NO_BOTS = 2
 blue_bots = []
 red_bots = []
+ball = None
+world = None
 
 class TurtleBot:
     def __init__(self, color, index, world):
@@ -26,6 +28,12 @@ class TurtleBot:
         self.world = world
         self.teleport_random()
         self.draw()
+
+    def x(self):
+        return self.pos['x']
+
+    def y(self):
+        return self.pos['y']
 
     def in_home_territory(self):
         return (self.color == RED and self.pos['y'] >= BOARD_HEIGHT/2) or (self.color == BLUE and self.pos['y'] < BOARD_HEIGHT/2)
@@ -163,6 +171,17 @@ class TurtleWorld:
 
         return distance
 
+    def ball_dist(self, bot, axis):
+        bx, by = ball.pos['x'], ball.pos['y']
+
+        distance = 0
+        if axis == X:
+            distance = bx - bot.pos['x']
+        elif axis == Y:
+            distance = by - bot.pos['y']
+
+        return distance
+
     def turtle_dist(self, bot, color, index, axis):
         ox, oy = -1, -1
         other_bot = None
@@ -277,6 +296,58 @@ class TurtleWorld:
             self.t.color('red')
             self.t.goto(x, HEIGHT/2)
 
+
+class Ball():
+    def __init__(self):
+        self.t= turtle.Turtle()
+        self.t.shape('circle')
+        self.t.pu()
+        self.teleport_random()
+
+    def _conflict(self, bot):
+        return self.pos['x'] == bot.x() and self.pos['y'] == bot.y()
+
+    def teleport_random(self):
+        while True:
+            conflict = False
+            self.pos = { 'x': random.randint(0, BOARD_WIDTH-1) , 'y': random.randint(0, BOARD_HEIGHT-1) }
+
+            for bot in blue_bots + red_bots:
+                if self._conflict(bot):
+                    conflict = True
+
+            if self.pos['x'] == world.blue_flag_pos[0] and self.pos['y'] == world.blue_flag_pos[1]:
+                conflict = True
+
+            if self.pos['x'] == world.red_flag_pos[0] and self.pos['y'] == world.red_flag_pos[1]:
+                conflict = True
+
+            if not conflict:
+                break
+
+
+    def move(self, ratio=0.05):
+        # in the move function, we just check if a bot is on top of us
+        # if there is, we increase the score and teleport ourselves away
+        for bot in blue_bots + red_bots:
+            if self.pos['x'] == bot.x() and self.pos['y'] == bot.y():
+                self.teleport_random()
+                if bot.color == BLUE:
+                    world.blue_score += 1
+                elif bot.color == RED:
+                    world.red_score += 1
+
+        if random.random() < ratio:
+            self.teleport_random()
+
+
+    def draw(self):
+        x = self.pos['x'] * WIDTH/BOARD_WIDTH - WIDTH / 2 + WIDTH/20
+        y = self.pos['y'] * HEIGHT/BOARD_HEIGHT - HEIGHT/ 2 + HEIGHT/20
+        self.t.goto(x,y)
+
+
+# Initialization Code
 turtle.tracer(0)
 world = TurtleWorld(BOARD_WIDTH)
 for i in range(NO_BOTS):
@@ -284,6 +355,7 @@ for i in range(NO_BOTS):
     blue_bots.append(blue_t)
     red_t = TurtleBot(RED, i, world)
     red_bots.append(red_t)
+ball = Ball()
 
 def calc_distance(bot1, bot2):
     return abs(bot1.pos['x'] - bot2.pos['x']) + abs(bot1.pos['y'] - bot2.pos['y'])
@@ -323,8 +395,12 @@ def run_step():
 
     resolve_move_conflicts()
 
+    ball.move()
+    
     for bot in blue_bots + red_bots:
         bot.draw()
+
+    ball.draw()
 
     world.draw_score()
     turtle.update()
